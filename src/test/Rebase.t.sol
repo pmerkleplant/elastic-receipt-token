@@ -110,16 +110,36 @@ contract Rebase is Test {
         }
     }
 
-    function testRebaseZeroSupplyTarget() public {
-        // Does not run into division by zero.
+    function testNoRebaseIfZeroSupplyTarget() public {
+        underlier.mint(address(ert), 10e18);
         ert.rebase();
+
+        uint supplyBefore = ert.totalSupply();
+        assertEq(supplyBefore, 10e18);
+
+        underlier.burn(address(ert), 10e18);
+        ert.rebase();
+
+        uint supplyAfter = ert.totalSupply();
+
+        // Did not adjust the supply.
+        assertEq(supplyAfter, supplyBefore);
     }
 
-    function testFailRebaseMAX_SUPPLY() public {
-        underlier.mint(address(ert), MAX_SUPPLY + 1);
-
-        // Fails with MaxUnderlierReached.
+    function testNoRebaseIfMaxSupplyTarget() public {
+        underlier.mint(address(ert), 10e18);
         ert.rebase();
+
+        uint supplyBefore = ert.totalSupply();
+        assertEq(supplyBefore, 10e18);
+
+        underlier.mint(address(ert), MAX_SUPPLY - 10e18 + 1);
+        ert.rebase();
+
+        uint supplyAfter = ert.totalSupply();
+
+        // Did not adjust the supply.
+        assertEq(supplyAfter, supplyBefore);
     }
 
     //--------------------------------------------------------------------------

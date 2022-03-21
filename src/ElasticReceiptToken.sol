@@ -199,9 +199,8 @@ abstract contract ElasticReceiptToken is IRebasingERC20 {
 
     /// @dev Returns the current supply target with number of decimals precision
     ///      being equal to the number of decimals given in the constructor.
-    /// @dev The supply target SHOULD never be zero.
-    ///      In case the supply target is zero no supply adjustment is executed.
-    /// @dev The supply target MUST not be higher than MAX_SUPPLY.
+    /// @dev The supply target MUST never be zero or higher than MAX_SUPPLY,
+    ///      otherwise no supply adjustment can be executed.
     /// @dev Has to be implemented in downstream contract.
     function _supplyTarget() internal virtual returns (uint);
 
@@ -552,14 +551,10 @@ abstract contract ElasticReceiptToken is IRebasingERC20 {
     function _rebase() private {
         uint supplyTarget = _supplyTarget();
 
-        // Don't run into a div by zero.
-        if (supplyTarget == 0) {
+        // Do not adjust supply if target is outside of valid supply range.
+        // Note to not revert as this would make transfer's impossible.
+        if (supplyTarget == 0 || supplyTarget > MAX_SUPPLY) {
             return;
-        }
-
-        // Do not accept a supply target higher than MAX_SUPPLY.
-        if (supplyTarget > MAX_SUPPLY) {
-            revert MaxSupplyReached();
         }
 
         // Adjust conversion rate and total token supply.

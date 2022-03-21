@@ -10,7 +10,7 @@ import "./Test.t.sol";
  */
 contract MintBurn is Test {
 
-    function testFailMintMoreThanMAX_SUPPLY(address to) public {
+    function testFailMintMoreThanMaxSupply(address to) public {
         if (to == address(0)) {
             revert();
         }
