@@ -41,6 +41,7 @@ import "./interfaces/_external/IRebasingERC20.sol";
  *      -> Public account balance               `_accountBits[account] / _bitsPerToken`
  *      -> Public total token supply            `_totalTokenSupply`
  *
+ * @author Buttonwood Foundation
  * @author merkleplant
  */
 abstract contract ElasticReceiptToken is IRebasingERC20 {
