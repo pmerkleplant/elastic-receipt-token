@@ -216,7 +216,7 @@ abstract contract ElasticReceiptToken is IRebasingERC20 {
         onAfterRebase
         returns (bool)
     {
-        uint bits = tokens * _bitsPerToken;
+        uint bits = _tokensToBits(tokens);
 
         _transfer(msg.sender, to, tokens, bits);
 
@@ -233,7 +233,7 @@ abstract contract ElasticReceiptToken is IRebasingERC20 {
         onAfterRebase
         returns (bool)
     {
-        uint bits = tokens * _bitsPerToken;
+        uint bits = _tokensToBits(tokens);
 
         _useAllowance(from, msg.sender, tokens);
         _transfer(from, to, tokens, bits);
@@ -250,7 +250,7 @@ abstract contract ElasticReceiptToken is IRebasingERC20 {
         returns (bool)
     {
         uint bits = _accountBits[msg.sender];
-        uint tokens = bits / _bitsPerToken;
+        uint tokens = _bitsToTokens(bits);
 
         _transfer(msg.sender, to, tokens, bits);
 
@@ -267,7 +267,7 @@ abstract contract ElasticReceiptToken is IRebasingERC20 {
         returns (bool)
     {
         uint bits = _accountBits[from];
-        uint tokens = bits / _bitsPerToken;
+        uint tokens = _bitsToTokens(bits);
 
         // Note that a transfer of zero tokens is valid to handle dust.
         if (tokens == 0) {
@@ -291,7 +291,7 @@ abstract contract ElasticReceiptToken is IRebasingERC20 {
         validRecipient(spender)
         returns (bool)
     {
-         _tokenAllowances[msg.sender][spender] = tokens;
+        _tokenAllowances[msg.sender][spender] = tokens;
 
         emit Approval(msg.sender, spender, tokens);
         return true;
@@ -452,7 +452,9 @@ abstract contract ElasticReceiptToken is IRebasingERC20 {
 
     /// @dev Convert tokens (elastic amount) to bits (fixed amount).
     function _tokensToBits(uint tokens) internal view returns (uint) {
-        return tokens * _bitsPerToken;
+        return _bitsPerToken == 0
+                ? tokens * BITS_PER_UNDERLYING
+                : tokens * _bitsPerToken;
     }
 
     /// @dev Convert bits (fixed amount) to tokens (elastic amount).
@@ -477,16 +479,8 @@ abstract contract ElasticReceiptToken is IRebasingERC20 {
             revert MaxSupplyReached();
         }
 
-        // Calculate the amount of bits to mint and the new total amount of
-        // active bits.
-        uint bitsNeeded;
-        if (_bitsPerToken == 0) {
-            // Use initial conversion rate for first mint.
-            bitsNeeded = tokens * BITS_PER_UNDERLYING;
-        } else {
-            // Use current conversion rate for non-initial mint.
-            bitsNeeded = tokens * _bitsPerToken;
-        }
+        // Get amount of bits to mint and new total amount of active bits.
+        uint bitsNeeded = _tokensToBits(tokens);
         uint newActiveBits = _activeBits() + bitsNeeded;
 
         // Increase total token supply and adjust conversion rate only if no
@@ -521,11 +515,11 @@ abstract contract ElasticReceiptToken is IRebasingERC20 {
         returns (uint)
     {
         // Cache the bit amount of tokens and execute rebase.
-        uint bits = tokens * _bitsPerToken;
+        uint bits = _tokensToBits(tokens);
         _rebase();
 
         // Re-calculate the token amount and transfer them to zero address.
-        tokens = bits / _bitsPerToken;
+        tokens = _bitsToTokens(bits);
         _transfer(from, address(0), tokens, bits);
 
         // Adjust total token supply and conversion rate.
