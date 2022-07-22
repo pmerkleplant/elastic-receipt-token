@@ -34,19 +34,6 @@ To install with [**Foundry**](https://github.com/gakonst/foundry):
 forge install pmerkleplant/elastic-receipt-token
 ```
 
-Common tasks are executed through a `Makefile`:
-```sh
-make help
-> build                    Build project
-> clean                    Remove build artifacts
-> simulation               Run simulation
-> test                     Run whole testsuite
-> testDeployment           Run deployment tests
-> testRebase               Run rebase tests
-> testToken                Run ERC20 tests
-```
-
-
 ## Acknowledgements
 
 These contracts were inspired by or directly modified from:

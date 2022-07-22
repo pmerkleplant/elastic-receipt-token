@@ -1,43 +1,42 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 pragma solidity 0.8.10;
 
-import "ds-test/test.sol";
-
 import "./Test.t.sol";
 
 /**
  * @dev ERC20 Tests.
  */
-contract ERC20 is Test {
+contract ERC20 is ElasticReceiptTokenTest {
 
     bytes32 constant PERMIT_TYPEHASH =
         keccak256("Permit(address owner,address spender,uint256 value,uint256 nonce,uint256 deadline)");
 
     function testApprove(address owner, address spender, uint amount)
+        assumeTestAddress(owner)
+        assumeTestAddress(spender)
         public
     {
         // Note that an approval of zero is valid.
-        if (owner == address(0) || spender == address(0)) {
-            return;
-        }
 
-        EVM.prank(owner);
+        vm.prank(owner);
         assertTrue(ert.approve(spender, amount));
 
         assertEq(ert.allowance(owner, spender), amount);
     }
 
-    function testApproveInf(address owner, address spender) public {
-        if (owner == address(0) || spender == address(0)) {
-            return;
-        }
+    function testApproveInf(address owner, address spender)
+        assumeTestAddress(owner)
+        assumeTestAddress(spender)
+        public
+    {
+        vm.assume(owner != spender);
 
         mintToUser(owner, 1e9);
 
-        EVM.prank(owner);
+        vm.prank(owner);
         assertTrue(ert.approve(spender, type(uint).max));
 
-        EVM.prank(spender);
+        vm.prank(spender);
         assertTrue(ert.transferFrom(owner, spender, 1e9));
 
         assertEq(ert.allowance(owner, spender), type(uint).max);
@@ -47,13 +46,10 @@ contract ERC20 is Test {
         address owner,
         address spender,
         uint erts
-    ) public {
+    ) public assumeTestAddress(owner) assumeTestAddress(spender) {
         // Note that an allowance increase of zero is valid.
-        if (owner == address(0) || spender == address(0)) {
-            return;
-        }
 
-        EVM.prank(owner);
+        vm.prank(owner);
         assertTrue(ert.increaseAllowance(spender, erts));
 
         assertEq(ert.allowance(owner, spender), erts);
@@ -63,16 +59,15 @@ contract ERC20 is Test {
         address owner,
         address spender,
         uint erts
-    ) public {
+    ) public assumeTestAddress(owner) assumeTestAddress(spender) {
         // Note that an allowance increase/decrease of zero is valid.
-        if (owner == address(0) || spender == address(0)) {
-            return;
-        }
+        vm.assume(owner != address(0));
+        vm.assume(spender != address(0));
 
-        EVM.prank(owner);
+        vm.prank(owner);
         assertTrue(ert.increaseAllowance(spender, erts));
 
-        EVM.prank(owner);
+        vm.prank(owner);
         assertTrue(ert.decreaseAllowance(spender, erts));
 
         assertEq(ert.allowance(owner, spender), 0);
@@ -80,17 +75,13 @@ contract ERC20 is Test {
 
     function testTransfer(address from, address to, uint erts)
         public
+        assumeTestAddress(from)
+        assumeTestAddress(to)
+        assumeTestAmount(erts)
     {
-        if (from == address(0) || to == address(0) || erts == 0) {
-            return;
-        }
-        if (erts > MAX_SUPPLY) {
-            return;
-        }
-
         mintToUser(from, erts);
 
-        EVM.prank(from);
+        vm.prank(from);
         assertTrue(ert.transfer(to, erts));
 
         if (from != to) {
@@ -101,17 +92,15 @@ contract ERC20 is Test {
 
     function testTransferAll(address from, address to, uint erts)
         public
+        assumeTestAddress(from)
+        assumeTestAddress(to)
+        assumeTestAmount(erts)
     {
-        if (from == address(0) || to == address(0) || erts == 0) {
-            return;
-        }
-        if (erts > MAX_SUPPLY) {
-            return;
-        }
+        vm.assume(from != to);
 
         mintToUser(from, erts);
 
-        EVM.prank(from);
+        vm.prank(from);
         assertTrue(ert.transferAll(to));
 
         assertEq(ert.balanceOf(from), 0);
@@ -120,20 +109,18 @@ contract ERC20 is Test {
 
     function testTransferFrom(address owner, address spender, uint erts)
         public
+        assumeTestAddress(owner)
+        assumeTestAddress(spender)
+        assumeTestAmount(erts)
     {
-        if (owner == address(0) || spender == address(0) || erts == 0) {
-            return;
-        }
-        if (erts > MAX_SUPPLY) {
-            return;
-        }
+        vm.assume(owner != spender);
 
         mintToUser(owner, erts);
 
-        EVM.prank(owner);
+        vm.prank(owner);
         assertTrue(ert.approve(spender, erts));
 
-        EVM.prank(spender);
+        vm.prank(spender);
         assertTrue(ert.transferFrom(owner, spender, erts));
 
         assertEq(ert.balanceOf(owner), 0);
@@ -144,20 +131,20 @@ contract ERC20 is Test {
         address owner,
         address spender,
         uint erts
-    ) public {
-        if (owner == address(0) || spender == address(0) || erts == 0) {
-            return;
-        }
-        if (erts > MAX_SUPPLY) {
-            return;
-        }
+    )
+        public
+        assumeTestAddress(owner)
+        assumeTestAddress(spender)
+        assumeTestAmount(erts)
+    {
+        vm.assume(owner != spender);
 
         mintToUser(owner, erts);
 
-        EVM.prank(owner);
+        vm.prank(owner);
         assertTrue(ert.approve(spender, erts));
 
-        EVM.prank(spender);
+        vm.prank(spender);
         assertTrue(ert.transferAllFrom(owner, spender));
 
         assertEq(ert.balanceOf(owner), 0);
@@ -167,10 +154,8 @@ contract ERC20 is Test {
     function testTransferAllFromWithZeroToken(
         address owner,
         address spender
-    ) public {
-        if (owner == address(0) || spender == address(0) || owner == spender) {
-            return;
-        }
+    ) public assumeTestAddress(owner) assumeTestAddress(spender) {
+        vm.assume(owner != spender);
 
         // Create owner balance with bit amount unequal to zero but token
         // balance being zero.
@@ -182,17 +167,17 @@ contract ERC20 is Test {
         assertEq(ert.balanceOf(owner), 0);
         assertTrue(ert.scaledBalanceOf(owner) != 0);
 
-        EVM.prank(spender);
+        vm.prank(spender);
         try ert.transferAllFrom(owner, spender) {
             revert();
         } catch {
             // Fails due to not having enough allowance.
         }
 
-        EVM.prank(owner);
+        vm.prank(owner);
         ert.approve(spender, 1);
 
-        EVM.prank(spender);
+        vm.prank(spender);
         assertTrue(ert.transferAllFrom(owner, spender));
 
         assertEq(ert.allowance(owner, spender), 0);
@@ -202,18 +187,16 @@ contract ERC20 is Test {
         address from,
         address to,
         uint erts
-    ) public {
-        if (from == address(0) || to == address(0) || erts == 0) {
-            revert();
-        }
-        if (erts > MAX_SUPPLY) {
-            revert();
-        }
-
+    )
+        public
+        assumeTestAddress(from)
+        assumeTestAddress(to)
+        assumeTestAmount(erts)
+    {
         mintToUser(from, erts-1);
 
         // Fails with underflow due to insufficient balance.
-        EVM.prank(from);
+        vm.prank(from);
         ert.transfer(to, erts);
     }
 
@@ -221,21 +204,19 @@ contract ERC20 is Test {
         address owner,
         address spender,
         uint erts
-    ) public {
-        if (owner == address(0) || spender == address(0) || erts == 0) {
-            revert();
-        }
-        if (erts > MAX_SUPPLY) {
-            revert();
-        }
-
+    )
+        public
+        assumeTestAddress(owner)
+        assumeTestAddress(spender)
+        assumeTestAmount(erts)
+    {
         mintToUser(owner, erts-1);
 
-        EVM.prank(owner);
+        vm.prank(owner);
         ert.approve(spender, erts);
 
         // Fails with underflow due to insufficient balance.
-        EVM.prank(spender);
+        vm.prank(spender);
         ert.transferFrom(owner, owner, erts);
     }
 
@@ -243,21 +224,19 @@ contract ERC20 is Test {
         address owner,
         address spender,
         uint erts
-    ) public {
-        if (owner == address(0) || spender == address(0) || erts == 0) {
-            revert();
-        }
-        if (erts > MAX_SUPPLY) {
-            revert();
-        }
-
+    )
+        public
+        assumeTestAddress(owner)
+        assumeTestAddress(spender)
+        assumeTestAmount(erts)
+    {
         mintToUser(owner, erts);
 
-        EVM.prank(owner);
+        vm.prank(owner);
         ert.approve(spender, erts-1);
 
         // Fails with underflow due to insufficient allowance.
-        EVM.prank(spender);
+        vm.prank(spender);
         ert.transferFrom(owner, owner, erts);
     }
 
@@ -265,29 +244,27 @@ contract ERC20 is Test {
         address owner,
         address spender,
         uint erts
-    ) public {
-        if (owner == address(0) || spender == address(0) || erts == 0) {
-            revert();
-        }
-        if (erts > MAX_SUPPLY) {
-            revert();
-        }
-
+    )
+        public
+        assumeTestAddress(owner)
+        assumeTestAddress(spender)
+        assumeTestAmount(erts)
+    {
         mintToUser(owner, erts);
 
-        EVM.prank(owner);
+        vm.prank(owner);
         ert.approve(spender, erts-1);
 
         // Fails with underflow due to insufficient allowance.
-        EVM.prank(spender);
+        vm.prank(spender);
         ert.transferFrom(owner, owner, erts);
     }
 
     function testPermit() public {
         uint256 privateKey = 0xBEEF;
-        address owner = EVM.addr(privateKey);
+        address owner = vm.addr(privateKey);
 
-        (uint8 v, bytes32 r, bytes32 s) = EVM.sign(
+        (uint8 v, bytes32 r, bytes32 s) = vm.sign(
             privateKey,
             keccak256(
                 abi.encodePacked(
@@ -306,9 +283,9 @@ contract ERC20 is Test {
 
     function testFailPermitBadNonce() public {
         uint256 privateKey = 0xBEEF;
-        address owner = EVM.addr(privateKey);
+        address owner = vm.addr(privateKey);
 
-        (uint8 v, bytes32 r, bytes32 s) = EVM.sign(
+        (uint8 v, bytes32 r, bytes32 s) = vm.sign(
             privateKey,
             keccak256(
                 abi.encodePacked(
@@ -325,9 +302,9 @@ contract ERC20 is Test {
 
     function testFailPermitBadDeadline() public {
         uint256 privateKey = 0xBEEF;
-        address owner = EVM.addr(privateKey);
+        address owner = vm.addr(privateKey);
 
-        (uint8 v, bytes32 r, bytes32 s) = EVM.sign(
+        (uint8 v, bytes32 r, bytes32 s) = vm.sign(
             privateKey,
             keccak256(
                 abi.encodePacked(
@@ -344,9 +321,9 @@ contract ERC20 is Test {
 
     function testFailPermitPastDeadline() public {
         uint256 privateKey = 0xBEEF;
-        address owner = EVM.addr(privateKey);
+        address owner = vm.addr(privateKey);
 
-        (uint8 v, bytes32 r, bytes32 s) = EVM.sign(
+        (uint8 v, bytes32 r, bytes32 s) = vm.sign(
             privateKey,
             keccak256(
                 abi.encodePacked(
@@ -363,9 +340,9 @@ contract ERC20 is Test {
 
     function testFailPermitReplay() public {
         uint256 privateKey = 0xBEEF;
-        address owner = EVM.addr(privateKey);
+        address owner = vm.addr(privateKey);
 
-        (uint8 v, bytes32 r, bytes32 s) = EVM.sign(
+        (uint8 v, bytes32 r, bytes32 s) = vm.sign(
             privateKey,
             keccak256(
                 abi.encodePacked(

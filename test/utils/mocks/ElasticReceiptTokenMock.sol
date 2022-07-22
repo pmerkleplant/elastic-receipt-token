@@ -3,7 +3,7 @@ pragma solidity 0.8.10;
 
 import {ERC20} from "solmate/tokens/ERC20.sol";
 
-import "../../../ElasticReceiptToken.sol";
+import "src/ElasticReceiptToken.sol";
 
 contract ElasticReceiptTokenMock is ElasticReceiptToken {
 

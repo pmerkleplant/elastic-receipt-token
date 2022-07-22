@@ -1,8 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 pragma solidity 0.8.10;
 
-import "ds-test/test.sol";
-
 import "./Test.t.sol";
 
 /**
@@ -10,7 +8,7 @@ import "./Test.t.sol";
  *
  *      Uses a table-driven test approach.
  */
-contract Rebase is Test {
+contract Rebase is ElasticReceiptTokenTest {
 
     struct TestCase {
         // The user balances.
@@ -148,12 +146,12 @@ contract Rebase is Test {
     function setUpUserBalance(address user, uint balance) public {
         underlier.mint(user, balance);
 
-        EVM.startPrank(user);
+        vm.startPrank(user);
         {
             underlier.approve(address(ert), balance);
             ert.mint(balance);
         }
-        EVM.stopPrank();
+        vm.stopPrank();
 
         ert.rebase();
     }

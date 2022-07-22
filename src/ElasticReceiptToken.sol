@@ -17,20 +17,26 @@ import "./interfaces/_external/IRebasingERC20.sol";
  *      the assumption that the supply target changes precisely by the amount
  *      of tokens minted/burned.
  *
- *      For example:
+ *      # Example Use-Case
+ *
  *      Using the Elastic Receipt Token with a treasury as downstream contract
  *      holding assets worth 10,000 USD, and returning that amount in the
  *      `_supplyTarget()` function, leads to a token supply of 10,000.
+ *
  *      If a user wants to deposit assets worth 1,000 USD into the treasury,
  *      the treasury fetches the assets from the user and mints 1,000 Elastic
  *      Receipt Tokens to the user.
- *      If the treasury's valuation contracts to 5,000 USD, the tokens balance
+ *
+ *      If the treasury's valuation contracts to 5,000 USD, the token balance
  *      of each user, and the total token supply, is decreased by 50%.
- *      In case of an expansion of the treasury valuation, the user balances
- *      and the total token supply is increased by the percentage change of the
- *      treasury's valuation.
+ *      In case of an expansion of the treasury's valuation, the user balances
+ *      and the total token supply is increased by the respective percentage
+ *      change.
+ *
  *      Note that the expansion/contraction of the treasury needs to be send
  *      upstream through the `_supplyTarget()` function!
+ *
+ *      # Glossary
  *
  *      As any elastic supply token, the Elastic Receipt Token defines an
  *      internal (fixed) user balance and an external (elastic) user balance.

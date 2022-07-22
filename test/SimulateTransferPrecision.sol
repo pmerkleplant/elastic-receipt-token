@@ -1,8 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 pragma solidity 0.8.10;
 
-import "ds-test/test.sol";
-
 import "./Test.t.sol";
 
 /**
@@ -26,7 +24,7 @@ import "./Test.t.sol";
  *              or contract from MAX_SUPPLY to 1.
  *
  */
-contract SimulateTransferPrecision is Test {
+contract SimulateTransferPrecision is ElasticReceiptTokenTest {
 
     // The granularity by which the supply should be adjusted in each iteration.
     // Should not be zero due to div by zero at compile time.
@@ -57,15 +55,15 @@ contract SimulateTransferPrecision is Test {
         address u2 = address(2);
 
         // Users give infinite approval of mock tokens to downstream contract.
-        EVM.prank(u1);
+        vm.prank(u1);
         underlier.approve(address(ert), type(uint).max);
-        EVM.prank(u2);
+        vm.prank(u2);
         underlier.approve(address(ert), type(uint).max);
 
         // Users give infinite approval of erts to this contract.
-        EVM.prank(u1);
+        vm.prank(u1);
         ert.approve(address(this), type(uint).max);
-        EVM.prank(u2);
+        vm.prank(u2);
         ert.approve(address(this), type(uint).max);
 
         // User 1 receives currentSupply of erts.

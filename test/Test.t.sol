@@ -1,11 +1,10 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 pragma solidity 0.8.10;
 
-import "ds-test/test.sol";
+import "forge-std/Test.sol";
 
-import "../ElasticReceiptToken.sol";
+import "src/ElasticReceiptToken.sol";
 
-import {HEVM} from "./utils/HEVM.sol";
 import {ElasticReceiptTokenMock}
     from "./utils/mocks/ElasticReceiptTokenMock.sol";
 import {ERC20Mock} from "./utils/mocks/ERC20Mock.sol";
@@ -16,9 +15,7 @@ import {ERC20Mock} from "./utils/mocks/ERC20Mock.sol";
  *      Provides the setUp function, access to common test utils and internal
  *      constants from the ElasticReceiptToken.
  */
-abstract contract Test is DSTest {
-    HEVM internal constant EVM = HEVM(0x7109709ECfa91a80626fF3989D68f67F5b1DD12D);
-
+abstract contract ElasticReceiptTokenTest is Test {
     // SuT
     ElasticReceiptTokenMock ert;
 
@@ -47,22 +44,26 @@ abstract contract Test is DSTest {
         );
     }
 
+    modifier assumeTestAmount(uint amount) {
+        vm.assume(amount != 0 && amount <= MAX_SUPPLY);
+        _;
+    }
+
+    modifier assumeTestAddress(address who) {
+        vm.assume(who != address(0));
+        vm.assume(who != address(ert));
+        _;
+    }
+
     function mintToUser(address user, uint erts) public {
         underlier.mint(user, erts);
 
-        EVM.startPrank(user);
+        vm.startPrank(user);
         {
             underlier.approve(address(ert), type(uint).max);
             ert.mint(erts);
         }
-        EVM.stopPrank();
-    }
-
-    function overflows(uint a, uint b) public pure returns (bool) {
-        unchecked {
-            uint x = a + b;
-            return x < a || x < b;
-        }
+        vm.stopPrank();
     }
 
     function underflows(uint a, uint b) public pure returns (bool) {

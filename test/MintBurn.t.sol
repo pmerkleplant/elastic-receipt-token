@@ -1,33 +1,28 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 pragma solidity 0.8.10;
 
-import "ds-test/test.sol";
-
 import "./Test.t.sol";
 
 /**
  * @dev Mint/Burn Tests.
  */
-contract MintBurn is Test {
+contract MintBurn is ElasticReceiptTokenTest {
 
     function testFailMintMoreThanMaxSupply(address to) public {
-        if (to == address(0)) {
-            revert();
-        }
+        vm.assume(to != address(0));
 
         // Fails with MaxSupplyReached.
         mintToUser(to, MAX_SUPPLY + 1);
     }
 
     function testFailBurnAll(address to, uint erts) public {
-        if (to == address(0) || erts == 0) {
-            revert();
-        }
+        vm.assume(to != address(0));
+        vm.assume(erts != 0);
 
         mintToUser(to, erts);
 
         // Fails with Division by 0.
-        EVM.prank(to);
+        vm.prank(to);
         ert.burn(erts);
     }
 
