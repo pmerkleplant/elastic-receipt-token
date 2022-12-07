@@ -1,0 +1,28 @@
+7c7
+<  * @title The Elastic Receipt Token
+---
+>  * @title The Elastic Receipt Token (Upgradeable Version)
+49a50,53
+>  * @dev The Upgradeable version offers an initialization function instead of
+>  *      using a constructor. The initialization function is re-callable as long
+>  *      as no mint operation got executed.
+>  *
+53c57
+< abstract contract ElasticReceiptToken is IRebasingERC20 {
+---
+> abstract contract ElasticReceiptTokenUpgradeable is IRebasingERC20 {
+183c187,196
+<     // Constructor
+---
+>     // Initialization
+> 
+>     /// @dev Initializes the contract.
+>     /// @dev Reinitialization possible as long as no tokens minted.
+>     function __ElasticReceiptToken_init(
+>         string memory name_,
+>         string memory symbol_,
+>         uint8 decimals_
+>     ) internal {
+>         require(_totalTokenSupply == 0);
+185d197
+<     constructor(string memory name_, string memory symbol_, uint8 decimals_) {

@@ -25,7 +25,6 @@ import "./Test.t.sol";
  *
  */
 contract SimulateTransferPrecision is ElasticReceiptTokenTest {
-
     // The granularity by which the supply should be adjusted in each iteration.
     // Should not be zero due to div by zero at compile time.
     uint constant MAX_ITERATIONS = 1;
@@ -36,7 +35,9 @@ contract SimulateTransferPrecision is ElasticReceiptTokenTest {
     function testSimulation() public {
         if (MAX_ITERATIONS == 1) {
             emit log_string("No simulation ran.");
-            emit log_string("For more information see SimulateTransferPrecision.t.sol");
+            emit log_string(
+                "For more information see SimulateTransferPrecision.t.sol"
+                );
             return;
         }
 
@@ -47,7 +48,7 @@ contract SimulateTransferPrecision is ElasticReceiptTokenTest {
         }
 
         uint currentSupply = SIMULATE_EXPANSION
-            ? 1           // Min supply to simulate expansion.
+            ? 1 // Min supply to simulate expansion.
             : MAX_SUPPLY; // Max supply to simulate contraction.
         uint nextSupplyChange = MAX_SUPPLY / MAX_ITERATIONS;
 
@@ -121,5 +122,4 @@ contract SimulateTransferPrecision is ElasticReceiptTokenTest {
             assertEq(balanceU2, ert.balanceOf(u2));
         }
     }
-
 }

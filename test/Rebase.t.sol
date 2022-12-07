@@ -9,7 +9,6 @@ import "./Test.t.sol";
  *      Uses a table-driven test approach.
  */
 contract Rebase is ElasticReceiptTokenTest {
-
     struct TestCase {
         // The user balances.
         uint[2] balances;
@@ -31,11 +30,11 @@ contract Rebase is ElasticReceiptTokenTest {
             // Rebase from min to max.
             TestCase([uint(1), 1], MAX_SUPPLY),
             // Max supply in one user with min rebase.
-            TestCase([uint(MAX_SUPPLY-1), 1], 1),
+            TestCase([uint(MAX_SUPPLY - 1), 1], 1),
             // Max supply in one user with max rebase.
-            TestCase([uint(MAX_SUPPLY-1), 1], MAX_SUPPLY),
+            TestCase([uint(MAX_SUPPLY - 1), 1], MAX_SUPPLY),
             // Max supply splitted with min rebase.
-            TestCase([uint(MAX_SUPPLY/2), MAX_SUPPLY/2], 1)
+            TestCase([uint(MAX_SUPPLY / 2), MAX_SUPPLY / 2], 1)
         ];
 
         // Execute each test case.
@@ -49,10 +48,7 @@ contract Rebase is ElasticReceiptTokenTest {
             // Init user balances and calculate total expected supply.
             uint totalSupply;
             for (uint j; j < balances.length; j++) {
-                setUpUserBalance(
-                    toAddress(j),
-                    balances[j]
-                );
+                setUpUserBalance(toAddress(j), balances[j]);
 
                 totalSupply += balances[j];
             }
@@ -63,10 +59,7 @@ contract Rebase is ElasticReceiptTokenTest {
             // Check that a user balance did not change due to a mint by
             // another user.
             for (uint j; j < balances.length; j++) {
-                assertEq(
-                    ert.balanceOf(toAddress(j)),
-                    balances[j]
-                );
+                assertEq(ert.balanceOf(toAddress(j)), balances[j]);
             }
 
             // Change the underlier's supply and execute rebase.
@@ -79,17 +72,11 @@ contract Rebase is ElasticReceiptTokenTest {
             // change during equilibrium rebase.
             for (uint j; j < balances.length; j++) {
                 if (testCase.newSupplyTarget > totalSupply) {
-                    assertTrue(
-                        ert.balanceOf(toAddress(j)) > balances[j]
-                    );
+                    assertTrue(ert.balanceOf(toAddress(j)) > balances[j]);
                 } else if (testCase.newSupplyTarget < totalSupply) {
-                    assertTrue(
-                        ert.balanceOf(toAddress(j)) < balances[j]
-                    );
+                    assertTrue(ert.balanceOf(toAddress(j)) < balances[j]);
                 } else {
-                    assertEq(
-                        ert.balanceOf(toAddress(j)), balances[j]
-                    );
+                    assertEq(ert.balanceOf(toAddress(j)), balances[j]);
                 }
             }
 
@@ -100,10 +87,7 @@ contract Rebase is ElasticReceiptTokenTest {
 
             // Check that user balances did not change compared to initial.
             for (uint j; j < balances.length; j++) {
-                assertEq(
-                    ert.balanceOf(toAddress(j)),
-                    balances[j]
-                );
+                assertEq(ert.balanceOf(toAddress(j)), balances[j]);
             }
         }
     }
@@ -157,7 +141,6 @@ contract Rebase is ElasticReceiptTokenTest {
     }
 
     function toAddress(uint a) public pure returns (address) {
-        return address(uint160(a+1));
+        return address(uint160(a + 1));
     }
-
 }

@@ -4,7 +4,7 @@ pragma solidity ^0.8.10;
 import "./interfaces/_external/IRebasingERC20.sol";
 
 /**
- * @title The Elastic Receipt Token
+ * @title The Elastic Receipt Token (Upgradeable Version)
  *
  * @dev The Elastic Receipt Token is a rebase token that "continuously"
  *      syncs the token supply with a supply target.
@@ -47,10 +47,14 @@ import "./interfaces/_external/IRebasingERC20.sol";
  *      -> Public account balance               `_accountBits[account] / _bitsPerToken`
  *      -> Public total token supply            `_totalTokenSupply`
  *
+ * @dev The Upgradeable version offers an initialization function instead of
+ *      using a constructor. The initialization function is re-callable as long
+ *      as no mint operation got executed.
+ *
  * @author Buttonwood Foundation
  * @author merkleplant
  */
-abstract contract ElasticReceiptToken is IRebasingERC20 {
+abstract contract ElasticReceiptTokenUpgradeable is IRebasingERC20 {
     //--------------------------------------------------------------------------
     // !!!        PLEASE READ BEFORE CHANGING ANY ACCOUNTING OR MATH         !!!
     //
@@ -180,9 +184,17 @@ abstract contract ElasticReceiptToken is IRebasingERC20 {
     mapping(address => uint) private _nonces;
 
     //--------------------------------------------------------------------------
-    // Constructor
+    // Initialization
 
-    constructor(string memory name_, string memory symbol_, uint8 decimals_) {
+    /// @dev Initializes the contract.
+    /// @dev Reinitialization possible as long as no tokens minted.
+    function __ElasticReceiptToken_init(
+        string memory name_,
+        string memory symbol_,
+        uint8 decimals_
+    ) internal {
+        require(_totalTokenSupply == 0);
+
         // Set IERC20Metadata.
         name = name_;
         symbol = symbol_;

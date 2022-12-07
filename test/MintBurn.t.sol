@@ -7,7 +7,6 @@ import "./Test.t.sol";
  * @dev Mint/Burn Tests.
  */
 contract MintBurn is ElasticReceiptTokenTest {
-
     function testFailMintMoreThanMaxSupply(address to) public {
         vm.assume(to != address(0));
 
@@ -25,5 +24,4 @@ contract MintBurn is ElasticReceiptTokenTest {
         vm.prank(to);
         ert.burn(erts);
     }
-
 }

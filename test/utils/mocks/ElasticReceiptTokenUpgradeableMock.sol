@@ -3,26 +3,30 @@ pragma solidity ^0.8.10;
 
 import {ERC20} from "solmate/tokens/ERC20.sol";
 
-import "src/ElasticReceiptToken.sol";
+import "src/ElasticReceiptTokenUpgradeable.sol";
 
-contract ElasticReceiptTokenMock is ElasticReceiptToken {
+contract ElasticReceiptTokenUpgradeableMock is
+    ElasticReceiptTokenUpgradeable
+{
     // The token's underlier.
     // Is of type ERC20.
     address public underlier;
 
-    constructor(
+    function init(
         address underlier_,
         string memory name_,
         string memory symbol_,
         uint8 decimals_
-    ) ElasticReceiptToken(name_, symbol_, decimals_) {
+    ) external {
+        __ElasticReceiptToken_init(name_, symbol_, decimals_);
+
         underlier = underlier_;
     }
 
     function _supplyTarget()
         internal
         view
-        override (ElasticReceiptToken)
+        override (ElasticReceiptTokenUpgradeable)
         returns (uint)
     {
         return ERC20(underlier).balanceOf(address(this));

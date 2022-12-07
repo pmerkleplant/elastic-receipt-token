@@ -5,8 +5,10 @@ import "forge-std/Test.sol";
 
 import "src/ElasticReceiptToken.sol";
 
-import {ElasticReceiptTokenMock}
-    from "./utils/mocks/ElasticReceiptTokenMock.sol";
+import {ElasticReceiptTokenMock} from
+    "./utils/mocks/ElasticReceiptTokenMock.sol";
+import {ElasticReceiptTokenUpgradeableMock} from
+    "./utils/mocks/ElasticReceiptTokenUpgradeableMock.sol";
 import {ERC20Mock} from "./utils/mocks/ERC20Mock.sol";
 
 /**
@@ -18,6 +20,7 @@ import {ERC20Mock} from "./utils/mocks/ERC20Mock.sol";
 abstract contract ElasticReceiptTokenTest is Test {
     // SuT
     ElasticReceiptTokenMock ert;
+    ElasticReceiptTokenUpgradeableMock ertUpgradeable;
 
     // Mocks
     ERC20Mock underlier;
@@ -42,6 +45,9 @@ abstract contract ElasticReceiptTokenTest is Test {
             SYMBOL,
             uint8(DECIMALS)
         );
+
+        ertUpgradeable = new ElasticReceiptTokenUpgradeableMock();
+        ertUpgradeable.init(address(underlier), NAME, SYMBOL, uint8(DECIMALS));
     }
 
     modifier assumeTestAmount(uint amount) {
@@ -72,5 +78,4 @@ abstract contract ElasticReceiptTokenTest is Test {
             return x > a;
         }
     }
-
 }
