@@ -31,15 +31,15 @@ by the percentage change of the treasury's valuation.
 
 To install with [**Foundry**](https://github.com/gakonst/foundry):
 ```sh
-forge install pmerkleplant/elastic-receipt-token
+$ forge install pmerkleplant/elastic-receipt-token
 ```
 
 ## Acknowledgements
 
 These contracts were inspired by or directly modified from:
-- [Ampleforth's Ample Token](https://github.com/ampleforth/ampleforth-contracts)
+- [Ampleforth's AMPL Token](https://github.com/ampleforth/ampleforth-contracts)
 - [Buttonwood's Button Wrappers](https://github.com/buttonwood-protocol/button-wrappers)
-- [Rari Capital's solmate](https://github.com/Rari-Capital/solmate)
+- [t11s' solmate](https://github.com/transmissions11/solmate)
 
 
 ## Safety
